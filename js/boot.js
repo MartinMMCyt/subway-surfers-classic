@@ -1,8 +1,7 @@
 /* eslint-disable func-names */
 /* eslint-disable no-var */
 /** Load script file */
-function loadScript(path, onComplete)
-{
+function loadScript(path, onComplete) {
     var script = document.createElement('script');
 
     if (onComplete) script.onload = onComplete;
@@ -11,16 +10,14 @@ function loadScript(path, onComplete)
 }
 
 /** Start up Poki SDK */
-function initPokiSDK(onComplete)
-{
+function initPokiSDK(onComplete) {
     var PokiSDK = window.PokiSDK;
 
     // No PokiSDK available, move on.
     if (!PokiSDK) return onComplete();
 
     // Promise callback, should be dispatched either way
-    function onInitComplete(adBlockerOn)
-    {
+    function onInitComplete(adBlockerOn) {
         PokiSDK.adBlockerOn = adBlockerOn;
         PokiSDK.gameLoadingStart();
         if (onComplete) onComplete();
@@ -28,22 +25,18 @@ function initPokiSDK(onComplete)
 
     // Init the SDK and notify about loading start
     return PokiSDK.init()
-        .then(function ()
-        {
+        .then(function() {
             onInitComplete(false);
         })
-        .catch(function ()
-        {
+        .catch(function() {
             onInitComplete(true);
         });
 }
 
 /** Init app */
-function initApp()
-{
+function initApp() {
     // Set SDK debug mode
-    if (window.PokiSDK && window.GAME_CONFIG && window.GAME_CONFIG.pokiSdkDebug !== undefined)
-    {
+    if (window.PokiSDK && window.GAME_CONFIG && window.GAME_CONFIG.pokiSdkDebug !== undefined) {
         window.PokiSDK.setDebug(window.GAME_CONFIG.pokiSdkDebug);
     }
 
@@ -52,8 +45,7 @@ function initApp()
 }
 
 /** Prevent arrows and space from scrolling browser */
-function preventDefaultKeyboardEvents()
-{
+function preventDefaultKeyboardEvents() {
     const keys = [
         ' ',
         'ArrowUp',
@@ -62,8 +54,7 @@ function preventDefaultKeyboardEvents()
         'ArrowRight',
     ];
 
-    function onKey(e)
-    {
+    function onKey(e) {
         if (keys.indexOf(e.key) < 0) return;
         e.preventDefault();
     }
@@ -72,26 +63,22 @@ function preventDefaultKeyboardEvents()
     window.addEventListener('keyup', onKey);
 }
 
-function registerServiceWorker(onComplete)
-{
-    if (navigator.serviceWorker && !window.NOSW)
-    {
+function registerServiceWorker(onComplete) {
+    if (navigator.serviceWorker && !window.NOSW) {
         console.log('Service worker available');
-        navigator.serviceWorker.register('./sw.js', { scope: './' })
-            .then(function ()
-            {
+        navigator.serviceWorker.register('./sw.js', {
+                scope: './'
+            })
+            .then(function() {
                 console.log('Service worker registered');
                 if (onComplete) onComplete();
             })
-            .catch(function (error)
-            {
+            .catch(function(error) {
                 // eslint-disable-next-line prefer-template
                 console.log('Service worker registration failed - ' + error);
                 if (onComplete) onComplete();
             });
-    }
-    else if (onComplete)
-    {
+    } else if (onComplete) {
         onComplete();
     }
 }
@@ -100,10 +87,8 @@ function registerServiceWorker(onComplete)
 preventDefaultKeyboardEvents();
 
 /** Register service worker if available */
-registerServiceWorker(function ()
-{
-    initPokiSDK(function ()
-    {
+registerServiceWorker(function() {
+    initPokiSDK(function() {
         initApp();
     });
 });
